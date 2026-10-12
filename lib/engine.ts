@@ -4,6 +4,18 @@ import { convertCircuitJsonToPcbSvg,convertCircuitJsonToSchematicSvg } from "cir
 import { convertCircuitJsonToGerberFiles } from "circuit-json-to-gerber";
 import { checkDesign,designSchema,parseValue,type Design,type Issue } from "./design";
 
+const svgSize={width:1000,height:650};
+
+function responsiveSvg(svg:string):string{
+ // The renderer uses pixel coordinates but omits a viewBox. Without one,
+ // shrinking the SVG with CSS clips the circuit instead of scaling it to fit.
+ return svg.replace(/<svg\b([^>]*)>/,(_root,attributes:string)=>{
+  const viewBox=/\bviewBox\s*=/.test(attributes)?"":` viewBox="0 0 ${svgSize.width} ${svgSize.height}"`;
+  const aspectRatio=/\bpreserveAspectRatio\s*=/.test(attributes)?"":' preserveAspectRatio="xMidYMid meet"';
+  return `<svg${attributes}${viewBox}${aspectRatio}>`;
+ });
+}
+
 export async function compileDesign(input:Design){
  const design=designSchema.parse(input);const errors=checkDesign(design).filter(i=>i.level==="error");if(errors.length)throw new Error(errors.map(i=>i.message).join(" "));
  const circuit=new Circuit();
@@ -26,7 +38,7 @@ export async function compileDesign(input:Design){
  if(!issues.some(i=>i.level==="error")&&traceCount>0){try{gerbers=convertCircuitJsonToGerberFiles(json);}catch{issues.push({level:"error",message:"Gerber conversion failed. Source and schematic exports remain available."});}}
  return {
   json:json as unknown as Record<string,unknown>[],issues,traceCount,gerbers,
-  schematicSvg:convertCircuitJsonToSchematicSvg(json,{width:1000,height:650,includeVersion:false,colorOverrides:{schematic:{background:"transparent",component_body:"#f6f0df",component_outline:"#6b7859",wire:"#8a9d78",pin:"#889974",pin_name:"#7a886b",pin_number:"#acb39e",reference:"#637350",value:"#939d85"}}}),
-  pcbSvg:convertCircuitJsonToPcbSvg(json,{width:1000,height:650,includeVersion:false,backgroundColor:"transparent",showSolderMask:false,showPinNumbers:true,shouldDrawRatsNest:issues.some(i=>i.level==="error"),shouldDrawErrors:true,colorOverrides:{copper:{top:"#d7b388",bottom:"#71a993"},substrate:"#153d2c",boardOutline:"#90a58c",drill:"#1e2e26",silkscreen:{top:"#d9dfc0",bottom:"#8ca694"}}}),
+  schematicSvg:responsiveSvg(convertCircuitJsonToSchematicSvg(json,{...svgSize,includeVersion:false,colorOverrides:{schematic:{background:"transparent",component_body:"#f6f0df",component_outline:"#6b7859",wire:"#8a9d78",pin:"#889974",pin_name:"#7a886b",pin_number:"#acb39e",reference:"#637350",value:"#939d85"}}})),
+  pcbSvg:responsiveSvg(convertCircuitJsonToPcbSvg(json,{...svgSize,includeVersion:false,backgroundColor:"transparent",showSolderMask:false,showPinNumbers:true,shouldDrawRatsNest:issues.some(i=>i.level==="error"),shouldDrawErrors:true,colorOverrides:{copper:{top:"#d7b388",bottom:"#71a993"},substrate:"#153d2c",boardOutline:"#90a58c",drill:"#1e2e26",silkscreen:{top:"#d9dfc0",bottom:"#8ca694"}}})),
  };
 }

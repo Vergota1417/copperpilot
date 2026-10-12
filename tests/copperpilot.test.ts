@@ -27,10 +27,19 @@ test("dangling pins, duplicate connections, and mismatched footprints are caught
 test("CSV protects formula-looking descriptions and escapes commas and quotes",()=>{
  const d=templateDesign("led");d.components[0].value='=HYPERLINK("x","y")';const csv=bomCsv(d);assert.ok(csv.includes('"\'=HYPERLINK(""x"",""y"")"'));
 });
-for(const t of templates)test(`${t.title} compiles to a routed PCB and genuine fabrication files`,{timeout:60000},async()=>{
+for(const t of templates)test(`${t.title} compiles to responsive diagrams, a routed PCB, and genuine fabrication files`,{timeout:60000},async()=>{
  const r=await compileDesign(t.design);assert.equal(r.issues.filter(i=>i.level==="error").length,0,JSON.stringify(r.issues));
  assert.ok(r.traceCount>=t.design.connections.length);assert.ok(r.json.some(e=>e.type==="pcb_board"));assert.ok(r.json.some(e=>e.type==="schematic_component"));
  assert.match(r.schematicSvg,/<svg/);assert.match(r.pcbSvg,/<svg/);assert.ok(r.gerbers["F_Cu.gbr"].includes("M02"));assert.ok(r.gerbers["Edge_Cuts.gbr"]);assert.ok(Object.keys(r.gerbers).some(k=>k.endsWith(".drl")));
+ for(const [name,svg] of Object.entries({schematic:r.schematicSvg,pcb:r.pcbSvg})){
+  const root=svg.match(/<svg\b[^>]*>/)?.[0]??"";
+  const width=Number(root.match(/\bwidth="([\d.]+)"/)?.[1]);
+  const height=Number(root.match(/\bheight="([\d.]+)"/)?.[1]);
+  assert.ok(width>0&&height>0,`${name} has a valid rendering size`);
+  const viewBox=root.match(/\bviewBox="([^"]+)"/)?.[1].trim().split(/[\s,]+/).map(Number);
+  assert.deepEqual(viewBox,[0,0,width,height],`${name} must scale its full drawing into narrow screens`);
+  assert.match(root,/\bpreserveAspectRatio="xMidYMid meet"/,`${name} must fit without stretching or cropping`);
+ }
 });
 test("AI unavailable does not silently turn into a fake generated design",async()=>{
  await assert.rejects(()=>generateDesign("Make a circuit",templateDesign("led"),{}),/AI is not connected/);

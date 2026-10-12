@@ -1,8 +1,10 @@
 name: Deploy CopperPilot to GitHub Pages
 
-# Enable Settings > Pages > Source: GitHub Actions, then run this workflow.
-# Publishing is explicit; regular pushes are validated by ci.yml.
+# Enable Settings > Pages > Source: GitHub Actions before the first deployment.
+# Main branch updates publish automatically after validation.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

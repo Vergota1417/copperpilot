@@ -93,8 +93,8 @@ The server-backed edition and its optional AI configuration remain available.
 GitHub Pages is not enabled merely by uploading source. A successful deployment
 run is the confirmation that the browser app has been published. The intended
 project path is `/copperpilot/`; all assets and the compiler worker are built for
-that path. Deployment is manual: rerun this workflow after updates you want to publish.
-Ordinary pushes run the validation workflow without deploying the website.
+that path. Once Pages is enabled, updates pushed to `main` are validated and
+published automatically. You can also use **Run workflow** to redeploy manually.
 
 ### First browser check
 
