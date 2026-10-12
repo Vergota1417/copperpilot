@@ -1,0 +1,24 @@
+COPPERPILOT - START HERE
+
+OPEN THE APP
+https://copperpilot.mj23mgomez4.chatgpt.site
+
+EXTRACT THIS DOWNLOAD ON WINDOWS
+1. Save CopperPilot-GitHub.zip to Downloads.
+2. Right-click the ZIP and select Extract All.
+3. Open the extracted CopperPilot-GitHub folder.
+4. You should see package.json, README.md, app, components, lib and scripts.
+   The project files are directly inside this folder.
+
+UPLOAD TO YOUR GITHUB REPOSITORY
+1. Open your copperpilot repository in GitHub.
+2. Choose Add file > Upload files.
+3. Drag the CONTENTS of the extracted folder into the upload area.
+   package.json must be at the repository root alongside app and lib.
+4. Commit the files. If the page reports too many files, upload smaller groups.
+5. Include the folders .github and .openai and the configuration files
+   that begin with a dot. They are included in this archive.
+
+The ZIP contains source code. Opening a .tsx file will not launch the app.
+Use the live link above, or follow README.md to run the project locally.
+Live AI generation needs a separately configured model connection.
