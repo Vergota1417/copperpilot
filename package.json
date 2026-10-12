@@ -13,7 +13,9 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "test": "node --import tsx --test tests/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:pages": "vite build --config vite.pages.config.ts",
+    "check:pages": "node --import tsx scripts/check-pages.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

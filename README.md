@@ -68,21 +68,59 @@ The model must already be installed in your own Ollama instance. Local model int
 
 Hosted Sites receive secrets through their environment settings. Preserve private access. AI requests require authenticated identity, reject foreign Origin values, and use a fixed server-configured provider endpoint. Changing the audience or using another host requires reviewing authentication and usage controls first.
 
-## GitHub
+## Run online with GitHub Pages
 
-Recommended repository name: **copperpilot**.
+Repository: https://github.com/Vergota1417/copperpilot
 
-The initial source was prepared for `Vergota1417/copperpilot`; repository creation was not completed in the authoring session because the GitHub creation page did not respond. Do not treat this as an existing GitHub repository until it is actually created.
+A dedicated browser build is included. It supports the editor, starter circuits,
+schematics, PCB routing, local project saving, JSON import, and all design exports.
+The Pages edition makes no AI API requests and contains no API key. Use **Copy
+prompt for my AI**, then import the returned circuit JSON, for an external-AI workflow.
+The server-backed edition and its optional AI configuration remain available.
 
-After extracting the source, with Git and the GitHub CLI installed and authenticated, run the included helper:
+### First deployment — entirely in your browser
+
+1. Open the repository's **Settings** tab.
+2. Select **Pages** in the left sidebar.
+3. Under **Build and deployment**, change **Source** to **GitHub Actions**.
+4. Open the repository's **Actions** tab.
+5. Choose **Deploy CopperPilot to GitHub Pages** in the left sidebar.
+6. Click **Run workflow**, leave the branch as **main**, and confirm **Run workflow**.
+7. Open the new run. Wait until both **build** and **deploy** show green check marks.
+8. Click the published URL shown under **deploy**. You can also find it under
+   **Settings > Pages > Visit site**.
+
+GitHub Pages is not enabled merely by uploading source. A successful deployment
+run is the confirmation that the browser app has been published. The intended
+project path is `/copperpilot/`; all assets and the compiler worker are built for
+that path. Deployment is manual: rerun this workflow after updates you want to publish.
+Ordinary pushes run the validation workflow without deploying the website.
+
+### First browser check
+
+- Choose **New project > LED indicator** and wait for compilation.
+- Switch between **Schematic** and **PCB** and confirm the circuit is visible.
+- Select **R1** in **Parts** and change its value in **Inspector**.
+- Refresh the page and confirm the value was saved in the same browser.
+- Choose **Export > Project backup**, then import that JSON through **My projects**.
+- Choose **Export > Complete design bundle** and inspect the downloaded files.
+
+The Pages site and the earlier hosted site save projects separately because they
+have different web addresses. Export and import JSON to move projects between them.
+Full browser interaction testing remains to be performed after publication.
+
+### Build the Pages files locally
 
 ```sh
-node scripts/publish-github.mjs
+pnpm build:pages
+pnpm check:pages
 ```
 
-It initializes Git if needed, commits the source, and creates a **private** `copperpilot` repository under the authenticated account. It refuses to publish if a `github` remote is already configured. Review `gh auth status` first to ensure you are using the intended account. No token is embedded in the source.
+The build writes `dist-pages/`. The check verifies the deployed asset paths and
+runs the actual production compiler bundle with Web Worker globals and no network
+access. It is a compiler/build check, not a browser UI test.
 
-The included GitHub Actions workflow installs the locked dependencies, runs the circuit/validation/AI-contract tests, checks TypeScript, and builds the app.
+The original `pnpm dev` and `pnpm build` commands still use the server-backed edition.
 
 ## Architecture
 
